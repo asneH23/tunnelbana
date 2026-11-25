@@ -6,16 +6,18 @@ A small LED departure board for Stockholm's metro, built from a Raspberry Pi and
 in orange-yellow text like SL's platform signs.
 
 ```
-18 Alvik    7min
-18 Alvik   17min
-18 Hässel  27min     <- long names scroll
+18 Alvik          4 min
+18 Hässelby s    14 min     <- long names scroll
 ```
 
 ## Features
 
 - Live departures from SL's open Transport API (no API key needed)
 - Only metro trains in one direction, filtered with the API's `direction_code`
-- Line number, destination and minutes left, e.g. "7 min" (or "Nu")
+- Two rows like SL's platform signs: line number, destination and minutes left,
+  e.g. "7 min" (or "Nu")
+- A custom pixel font in the style of SL's signs (proportional letters, large
+  rounded lowercase, real descenders), drawn by hand in `tools/make_sl_font.py`
 - Long destination names scroll smoothly
 - Data is fetched every 30 seconds, while the screen is redrawn 20 times per second
   so the countdown stays accurate
@@ -34,7 +36,8 @@ in orange-yellow text like SL's platform signs.
 | `display.py` | Draws on the LED panel, or on the emulator when not on a Pi |
 | `main.py` | Main loop: fetch, handle errors, night mode, redraw |
 | `tests/` | pytest tests using a saved API response (no network needed) |
-| `fonts/` | Public domain BDF bitmap fonts |
+| `fonts/` | BDF bitmap fonts (the SL-style font is generated, see below) |
+| `tools/make_sl_font.py` | The SL-style font, drawn as text; run it to regenerate the font file |
 | `sl-skylt.service` | systemd service that starts the board at boot |
 | `emulator_config.json` | Settings for the emulator on the Mac |
 
@@ -181,6 +184,16 @@ Everything is in `config.py`. The most common changes:
   destinations to see which one is which for your station.
 - **Night mode:** `NIGHT_START`, `NIGHT_END`, and `NIGHT_BRIGHTNESS` (0 = off).
 - **Colors and brightness:** `TEXT_COLOR`, `BRIGHTNESS`.
+- **Number of rows:** `NUM_ROWS` (2 like SL's signs; 3 also fits on the panel).
+
+## Changing the font
+
+The SL-style font is drawn as text in `tools/make_sl_font.py`, where every `#` is
+one LED. To change a letter, edit its drawing and regenerate the font:
+
+```bash
+python tools/make_sl_font.py
+```
 
 ## How the direction filter was chosen
 

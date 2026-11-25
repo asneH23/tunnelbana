@@ -13,7 +13,7 @@ import config
 
 PROJECT_DIR = Path(__file__).parent
 SCROLL_GAP = 16  # empty pixels between the end and the restart of a scrolling name
-COLUMN_GAP = 2   # empty pixels between line number, destination and minutes
+COLUMN_GAP = 3   # empty pixels between line number, destination and minutes
 LETTER_SPACING = 1  # every glyph in our fonts ends with one empty column
 
 
