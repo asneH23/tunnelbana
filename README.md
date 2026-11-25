@@ -38,14 +38,6 @@ Alvik            14 min
 To change the mode of the board at boot, edit `DISPLAY_MODE` in `config.py`
 and restart the service (`sudo systemctl restart sl-skylt`).
 
-### Mode button
-
-A push button on the Pi switches between mode 1 and mode 2 while the board is
-running, so nobody needs SSH to change it. On the Mac, press **Enter** in the
-terminal where `main.py` runs to do the same thing.
-
-After a restart the board starts in `DISPLAY_MODE` again.
-
 ## Features
 
 - Live departures from SL's open Transport API (no API key needed)
@@ -74,7 +66,6 @@ After a restart the board starts in `DISPLAY_MODE` again.
 | `sl_api.py` | Fetches and filters departures. Knows nothing about the screen. |
 | `display.py` | Draws on the LED panel, or on the emulator when not on a Pi |
 | `main.py` | Main loop: fetch, handle errors, night mode, redraw |
-| `button.py` | The mode button (GPIO on the Pi, Enter key on the Mac) |
 | `tests/` | pytest tests using a saved API response (no network needed) |
 | `fonts/` | BDF bitmap fonts (the SL-style font is generated, see below) |
 | `tools/make_sl_font.py` | The SL-style font, drawn as text; run it to regenerate the font file |
@@ -88,7 +79,6 @@ After a restart the board starts in `DISPLAY_MODE` again.
 - Female-to-female jumper wires (no adapter board / HAT)
 - Separate 5 V / 4 A power supply for the panel
 - Micro-USB power supply for the Pi
-- Optional: a momentary push button (normally open) and two jumper wires
 
 ### Wiring
 
@@ -121,21 +111,6 @@ For a single panel (chain 1) you need these connections. "Pin" means the
 Power the panel from the separate 5 V supply through its own power connector.
 **Do not** power the panel from the Pi's 5 V pins: it can draw several amps.
 Do connect the panel's ground to the Pi's ground (the GND wire above).
-
-### Mode button (optional)
-
-Connect a push button between these two pins. They sit next to each other at the
-end of the header, away from the panel wires:
-
-| Button leg | Pi pin | GPIO |
-|------------|-------:|-----:|
-| one leg    | 37     | 26 |
-| other leg  | 39     | GND |
-
-No resistor is needed: the Pi's built-in pull-up resistor keeps the pin high,
-and pressing the button connects it to ground. To use another pin, change
-`BUTTON_GPIO` in `config.py` (pick one the panel doesn't use). Set it to `None`
-if you have no button.
 
 ## Running on the Mac (emulator)
 
@@ -202,9 +177,7 @@ python3 -m venv .venv
 .venv/bin/pip install ~/rpi-rgb-led-matrix   # builds the rgbmatrix Python bindings
 ```
 
-(The emulator is skipped automatically on the Pi, see `requirements.txt`. On the
-Pi it installs `gpiozero` and `lgpio` for the mode button instead. If `lgpio`
-fails to build, run `sudo apt install -y swig liblgpio-dev` and try again.)
+(The emulator is skipped automatically on the Pi, see `requirements.txt`.)
 If the build of the bindings fails, see the
 [Python bindings README](https://github.com/hzeller/rpi-rgb-led-matrix/tree/master/bindings/python).
 
@@ -249,7 +222,6 @@ Everything is in `config.py`. The most common changes:
 - **Ticker (mode 1):** `TICKER_SPEED` (pixels per second, lower is slower) and
   `TICKER_DEPARTURES`.
 - **Display mode:** `DISPLAY_MODE`, see [Display modes](#display-modes).
-- **Mode button:** `BUTTON_GPIO` (`None` turns it off).
 
 ## Changing the font
 
