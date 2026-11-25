@@ -14,6 +14,7 @@ import config
 PROJECT_DIR = Path(__file__).parent
 SCROLL_GAP = 16  # empty pixels between the end and the restart of a scrolling name
 COLUMN_GAP = 3   # empty pixels between the destination and the minutes
+UNIT_GAP = 1     # extra empty pixels between the number and "min"
 
 
 def running_on_raspberry_pi():
@@ -80,6 +81,7 @@ class Board:
         # Load fonts before creating the matrix (it may drop root privileges).
         self.small_font = load_font(config.FONT_SMALL)
         self.large_font = load_font(config.FONT_LARGE)
+        self.tiny_font = load_font(config.FONT_TINY)
         self.text_color = graphics.Color(*config.TEXT_COLOR)
         self.warning_color = graphics.Color(*config.WARNING_COLOR)
         self.black = graphics.Color(0, 0, 0)
@@ -93,7 +95,10 @@ class Board:
 
         # Fixed columns: [line number] [destination ...] [minutes]
         self.line_column = self.text_width(self.small_font, "88") + 2
-        self.minutes_column = self.width - self.text_width(self.small_font, "88")
+        # The minutes column fits the widest text, e.g. "12min" (with "min" in the tiny font).
+        self.unit_width = self.text_width(self.tiny_font, "min")
+        widest_minutes = self.text_width(self.small_font, "88") + UNIT_GAP + self.unit_width
+        self.minutes_column = self.width - widest_minutes
 
     # --- public methods, called from main.py -------------------------------
 
@@ -164,9 +169,20 @@ class Board:
 
         # 3. Line number on the left, minutes right-aligned.
         graphics.DrawText(self.canvas, font, 0, baseline, self.text_color, departure.line)
-        minutes = format_minutes(departure.minutes_left(now))
-        x = self.width - self.text_width(font, minutes)
-        graphics.DrawText(self.canvas, font, x, baseline, self.text_color, minutes)
+        self.draw_minutes(departure.minutes_left(now), baseline)
+
+    def draw_minutes(self, minutes, baseline):
+        """Draw e.g. "7min" (with a smaller "min") or "Nu", right-aligned."""
+        text = format_minutes(minutes)
+        if text == "Nu":
+            x = self.width - self.text_width(self.small_font, text)
+            graphics.DrawText(self.canvas, self.small_font, x, baseline, self.text_color, text)
+            return
+
+        unit_x = self.width - self.unit_width
+        number_x = unit_x - UNIT_GAP - self.text_width(self.small_font, text)
+        graphics.DrawText(self.canvas, self.small_font, number_x, baseline, self.text_color, text)
+        graphics.DrawText(self.canvas, self.tiny_font, unit_x, baseline, self.text_color, "min")
 
     def clear_columns(self, x_start, x_end, top):
         bottom = top + self.row_height - 1

@@ -6,16 +6,16 @@ A small LED departure board for Stockholm's metro, built from a Raspberry Pi and
 in orange-yellow text like SL's platform signs.
 
 ```
-18 Alvik        7
-18 Alvik       17
-18 Hässelby s  27     <- long names scroll
+18 Alvik    7min
+18 Alvik   17min
+18 Hässel  27min     <- long names scroll
 ```
 
 ## Features
 
 - Live departures from SL's open Transport API (no API key needed)
 - Only metro trains in one direction, filtered with the API's `direction_code`
-- Line number, destination and minutes left (or "Nu")
+- Line number, destination and minutes left, e.g. "7 min" (or "Nu")
 - Long destination names scroll smoothly
 - Data is fetched every 30 seconds, while the screen is redrawn 20 times per second
   so the countdown stays accurate

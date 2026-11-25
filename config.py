@@ -32,6 +32,7 @@ NUM_ROWS = 3                  # number of departures shown at once
 
 FONT_SMALL = "fonts/5x7.bdf"  # used for departure rows
 FONT_LARGE = "fonts/9x18B.bdf"  # used for the clock
+FONT_TINY = "fonts/4x6.bdf"   # used for the "min" after the minutes
 
 # Colors as (red, green, blue), 0-255.
 TEXT_COLOR = (255, 150, 0)    # orange-yellow, like SL platform signs
