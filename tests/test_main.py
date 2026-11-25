@@ -1,7 +1,7 @@
 from datetime import datetime, time
 
 from display import format_minutes, scroll_offset, shorten_name
-from main import is_night, parse_args, show_morning_message
+from main import in_message_period, is_night, parse_args, show_morning_message
 import config
 
 
@@ -81,3 +81,16 @@ def test_morning_message_can_be_turned_off(monkeypatch):
     monkeypatch.setattr(config, "MORNING_MESSAGE", [])
 
     assert not show_morning_message(datetime(2026, 11, 26, 7, 0), elapsed=3)
+
+
+def test_message_period_starts_before_night_ends(monkeypatch):
+    # 05:45 is still night (until 06:00), but the message period has started,
+    # which is what keeps the screen on in main().
+    monkeypatch.setattr(config, "MORNING_MESSAGE", ["Godmorgon!"])
+    monkeypatch.setattr(config, "MORNING_MESSAGE_DATE", "2026-11-26")
+    monkeypatch.setattr(config, "MORNING_MESSAGE_START", "05:45")
+    monkeypatch.setattr(config, "MORNING_MESSAGE_END", "09:00")
+    early = datetime(2026, 11, 26, 5, 50)
+
+    assert is_night(early.time(), "23:00", "06:00")
+    assert in_message_period(early)

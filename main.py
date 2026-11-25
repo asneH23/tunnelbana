@@ -35,17 +35,22 @@ def is_night(now_time, start_text=config.NIGHT_START, end_text=config.NIGHT_END)
     return in_period(now_time, start_text, end_text)
 
 
+def in_message_period(now):
+    """True during the morning message period (on the right date, if one is set)."""
+    if not config.MORNING_MESSAGE:
+        return False
+    if config.MORNING_MESSAGE_DATE and now.date().isoformat() != config.MORNING_MESSAGE_DATE:
+        return False
+    return in_period(now.time(), config.MORNING_MESSAGE_START, config.MORNING_MESSAGE_END)
+
+
 def show_morning_message(now, elapsed):
     """True when the morning message should be on screen instead of the departures.
 
     In the morning period the message is shown for MESSAGE_SECONDS once
     every MESSAGE_EVERY_SECONDS, so the departures are still visible most of the time.
     """
-    if not config.MORNING_MESSAGE:
-        return False
-    if config.MORNING_MESSAGE_DATE and now.date().isoformat() != config.MORNING_MESSAGE_DATE:
-        return False
-    if not in_period(now.time(), config.MORNING_MESSAGE_START, config.MORNING_MESSAGE_END):
+    if not in_message_period(now):
         return False
     return elapsed % config.MESSAGE_EVERY_SECONDS < config.MESSAGE_SECONDS
 
@@ -77,7 +82,9 @@ def main():
         while True:
             try:
                 now = datetime.now(STOCKHOLM)
-                night = config.NIGHT_MODE_ENABLED and is_night(now.time())
+                # The morning message wakes the screen even if night mode isn't over yet.
+                night = (config.NIGHT_MODE_ENABLED and is_night(now.time())
+                         and not in_message_period(now))
 
                 if night and config.NIGHT_BRIGHTNESS == 0:
                     board.show_nothing()
