@@ -186,6 +186,8 @@ Everything is in `config.py`. The most common changes:
   destinations to see which one is which for your station.
 - **Night mode:** `NIGHT_START`, `NIGHT_END`, and `NIGHT_BRIGHTNESS` (0 = off).
 - **Colors and brightness:** `TEXT_COLOR`, `BRIGHTNESS`.
+- **Long names on the top row:** they scroll by default. `SHORTEN_LONG_NAMES = True`
+  shortens them instead ("Farsta str."), using the words in `ABBREVIATIONS`.
 - **Ticker:** `TICKER_SPEED` (pixels per second, lower is slower) and
   `TICKER_DEPARTURES`. Set `TICKER_ENABLED = False` to show `NUM_ROWS` still rows instead.
 

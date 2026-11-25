@@ -43,6 +43,16 @@ FONT_LARGE = "fonts/9x18B.bdf"       # used for the clock
 TEXT_COLOR = (255, 150, 0)    # orange-yellow, like SL platform signs
 WARNING_COLOR = (200, 0, 0)   # small dot shown when the API can't be reached
 
+# Long destinations on the still rows scroll by default. Set this to True to
+# shorten them like SL's signs do ("Farsta strand" -> "Farsta str.") instead.
+# On a single 64 px panel there is only ~30 px for the name, so names get
+# cut hard ("Hässel."); it works best with a wider, chained display.
+SHORTEN_LONG_NAMES = False
+ABBREVIATIONS = {             # whole words that may be shortened, tried first
+    "strand": "str.",
+    "centrum": "C",
+}
+
 SCROLL_SPEED = 12             # pixels per second for long destination names
 SCROLL_PAUSE_SECONDS = 2      # pause before a long name starts scrolling
 

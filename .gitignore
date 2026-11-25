@@ -7,3 +7,7 @@ venv/
 
 # macOS
 .DS_Store
+
+# Large media files (reference videos etc.)
+*.mov
+*.MOV

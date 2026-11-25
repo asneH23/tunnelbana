@@ -43,6 +43,24 @@ def format_minutes(minutes):
     return "Nu" if minutes <= 0 else f"{minutes} min"
 
 
+def shorten_name(name, max_width, width_of):
+    """Shorten a destination so it fits in max_width pixels, like SL's signs.
+
+    1. Abbreviate known words:  "Farsta strand" -> "Farsta str."
+    2. If it is still too long, cut letters off the end and add a dot:
+       "Skogskyrkogården" -> "Skogskyrkog."
+    `width_of` is a function that returns the pixel width of a text.
+    """
+    if width_of(name) <= max_width:
+        return name
+
+    words = [config.ABBREVIATIONS.get(word, word) for word in name.split(" ")]
+    name = " ".join(words)
+    while width_of(name) > max_width and len(name) > 2:
+        name = name.rstrip(".")[:-1].rstrip() + "."
+    return name
+
+
 def scroll_offset(text_width, elapsed):
     """How many pixels a long text has moved left after `elapsed` seconds.
 
@@ -165,18 +183,24 @@ class Board:
         dest_x = self.ink_width(font, departure.line) + COLUMN_GAP
         dest_end = minutes_x - COLUMN_GAP  # first column the name must not use
 
-        # 1. Destination first. If it is too long it scrolls, and may spill
+        # 1. Destination first. Too long names are shortened ("Farsta str."),
+        #    or scroll if shortening is turned off. Scrolled text may spill
         #    into the other columns; step 2 cleans that up.
-        name_width = self.ink_width(font, departure.destination)
+        name = departure.destination
+        if config.SHORTEN_LONG_NAMES:
+            # Measure against the widest minutes ("88 min") so the name stays
+            # the same while the minutes count down.
+            space = self.width - self.ink_width(font, "88 min") - COLUMN_GAP - dest_x
+            name = shorten_name(name, space, lambda text: self.ink_width(font, text))
+
+        name_width = self.ink_width(font, name)
         if dest_x + name_width <= dest_end:
-            graphics.DrawText(self.canvas, font, dest_x, baseline, self.text_color,
-                              departure.destination)
+            graphics.DrawText(self.canvas, font, dest_x, baseline, self.text_color, name)
         else:
             x = dest_x - scroll_offset(name_width, elapsed)
             # Draw the text twice so a new copy follows right behind the first.
             for copy_x in (x, x + name_width + SCROLL_GAP):
-                graphics.DrawText(self.canvas, font, copy_x, baseline, self.text_color,
-                                  departure.destination)
+                graphics.DrawText(self.canvas, font, copy_x, baseline, self.text_color, name)
 
         # 2. Black out the line and minutes columns so scrolled text can't show there.
         self.clear_columns(0, dest_x, top)
