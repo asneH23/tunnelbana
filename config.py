@@ -84,6 +84,12 @@ GPIO_SLOWDOWN = 2             # Pi 3 usually needs 1-2; raise if the image flick
 PWM_BITS = 11                 # lower (e.g. 7) reduces flicker at the cost of colors
 DISABLE_HARDWARE_PULSING = False  # set True only if you can't turn off onboard audio
 
+# Push button that switches between mode 1 and mode 2 (optional).
+# Wire it between this GPIO and a ground pin, no resistor needed:
+#   GPIO 26 = physical pin 37, ground = physical pin 39 (right next to it).
+# Set to None if you have no button.
+BUTTON_GPIO = 26
+
 # The library normally drops root privileges after start. We keep them so the
 # program can still read files in the home directory (fonts etc.).
 DROP_PRIVILEGES = False

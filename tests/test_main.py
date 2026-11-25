@@ -1,7 +1,7 @@
 from datetime import time
 
 from display import format_minutes, scroll_offset, shorten_name
-from main import is_night, parse_args
+from main import is_night, next_mode, parse_args
 import config
 
 
@@ -50,3 +50,8 @@ def test_mode_flag(monkeypatch):
 def test_mode_defaults_to_config(monkeypatch):
     monkeypatch.setattr("sys.argv", ["main.py"])
     assert parse_args().mode == config.DISPLAY_MODE
+
+
+def test_button_switches_between_the_two_modes():
+    assert next_mode(1) == 2
+    assert next_mode(2) == 1

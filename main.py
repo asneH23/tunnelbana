@@ -11,6 +11,7 @@ import time
 from datetime import datetime, time as clock_time
 
 import config
+from button import ModeButton
 from display import Board
 from sl_api import STOCKHOLM, fetch_departures
 
@@ -31,6 +32,11 @@ def is_night(now_time, start_text=config.NIGHT_START, end_text=config.NIGHT_END)
     return now_time >= start or now_time < end  # e.g. 23:00-06:00
 
 
+def next_mode(mode):
+    """The mode a button press switches to: 1 -> 2 -> 1 ..."""
+    return 2 if mode == 1 else 1
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description="SL departure board")
     parser.add_argument("--mode", type=int, choices=[1, 2], default=config.DISPLAY_MODE,
@@ -46,6 +52,7 @@ def main():
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
 
     board = Board(mode=args.mode)
+    button = ModeButton()
     departures = []         # last successfully fetched departures
     api_ok = True
     last_fetch = None       # time.monotonic() of the last fetch attempt
@@ -57,6 +64,10 @@ def main():
     try:
         while True:
             try:
+                if button.was_pressed():
+                    board.set_mode(next_mode(board.mode))
+                    log.info("Switched to mode %s", board.mode)
+
                 now = datetime.now(STOCKHOLM)
                 night = config.NIGHT_MODE_ENABLED and is_night(now.time())
 

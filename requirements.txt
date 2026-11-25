@@ -1,6 +1,10 @@
 # Needed everywhere
 requests>=2.31
 
+# Push button on the Raspberry Pi (not needed on a Mac/PC)
+gpiozero>=2.0 ; platform_machine == "aarch64" or platform_machine == "armv7l"
+lgpio>=0.2 ; platform_machine == "aarch64" or platform_machine == "armv7l"
+
 # Development on a Mac/PC (not needed on the Raspberry Pi)
 RGBMatrixEmulator>=0.20 ; platform_machine != "aarch64" and platform_machine != "armv7l"
 pytest>=8

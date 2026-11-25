@@ -97,10 +97,8 @@ def make_options():
 
 class Board:
     def __init__(self, mode=1):
-        self.mode = mode  # 1 = big text + ticker, 2 = small text, still rows
-
         # Load fonts before creating the matrix (it may drop root privileges).
-        self.font = load_font(config.FONT_MODE1 if mode == 1 else config.FONT_MODE2)
+        self.fonts = {1: load_font(config.FONT_MODE1), 2: load_font(config.FONT_MODE2)}
         self.large_font = load_font(config.FONT_CLOCK)
         self.text_color = graphics.Color(*config.TEXT_COLOR)
         self.warning_color = graphics.Color(*config.WARNING_COLOR)
@@ -111,6 +109,14 @@ class Board:
         self.canvas = self.matrix.CreateFrameCanvas()
 
         self.width = config.PANEL_WIDTH
+        self.set_mode(mode)
+
+    # --- public methods, called from main.py -------------------------------
+
+    def set_mode(self, mode):
+        """1 = big text + ticker, 2 = small text in still rows."""
+        self.mode = mode
+        self.font = self.fonts[mode]
         self.num_rows = 2 if mode == 1 else config.MODE2_ROWS
         self.row_height = config.PANEL_HEIGHT // self.num_rows
 
@@ -118,9 +124,6 @@ class Board:
         # the screen, so nothing jumps when new data arrives mid-way.
         self.ticker_departures = []
         self.ticker_start = 0.0
-
-
-    # --- public methods, called from main.py -------------------------------
 
     def set_brightness(self, brightness):
         if self.matrix.brightness != brightness:
