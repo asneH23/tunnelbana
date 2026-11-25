@@ -22,13 +22,19 @@ DIRECTION_CODE = 1
 
 FETCH_INTERVAL_SECONDS = 30   # how often we ask the API for new data
 REQUEST_TIMEOUT_SECONDS = 10  # give up on a slow API call after this long
-FRAMES_PER_SECOND = 20        # how often the screen is redrawn
+FRAMES_PER_SECOND = 30        # how often the screen is redrawn (higher = smoother scrolling)
 
 # --- Layout and look ----------------------------------------------------------
 
 PANEL_WIDTH = 64
 PANEL_HEIGHT = 32
-NUM_ROWS = 2                  # number of departures shown at once (like SL's signs)
+NUM_ROWS = 2                  # rows of departures when the ticker is off
+
+# Ticker: the top row shows the next train, and the bottom row scrolls the
+# following departures from right to left, like a news ticker.
+TICKER_ENABLED = True
+TICKER_SPEED = 15             # pixels per second (lower = slower)
+TICKER_DEPARTURES = 3         # how many of the following departures scroll by
 
 FONT_SL = "fonts/sl-departures.bdf"  # SL-style font for departures (see tools/make_sl_font.py)
 FONT_LARGE = "fonts/9x18B.bdf"       # used for the clock

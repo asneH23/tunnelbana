@@ -15,6 +15,7 @@ PROJECT_DIR = Path(__file__).parent
 SCROLL_GAP = 16  # empty pixels between the end and the restart of a scrolling name
 COLUMN_GAP = 3   # empty pixels between line number, destination and minutes
 LETTER_SPACING = 1  # every glyph in our fonts ends with one empty column
+TICKER_GAP = 16  # empty pixels between two departures in the ticker
 
 
 def running_on_raspberry_pi():
@@ -90,7 +91,13 @@ class Board:
         self.canvas = self.matrix.CreateFrameCanvas()
 
         self.width = config.PANEL_WIDTH
-        self.row_height = config.PANEL_HEIGHT // config.NUM_ROWS
+        self.num_rows = 2 if config.TICKER_ENABLED else config.NUM_ROWS
+        self.row_height = config.PANEL_HEIGHT // self.num_rows
+
+        # The ticker keeps the departures it is showing for a whole pass across
+        # the screen, so nothing jumps when new data arrives mid-way.
+        self.ticker_departures = []
+        self.ticker_start = 0.0
 
 
     # --- public methods, called from main.py -------------------------------
@@ -100,10 +107,15 @@ class Board:
             self.matrix.brightness = brightness
 
     def show_departures(self, departures, now, elapsed, warning=False):
-        """Draw up to NUM_ROWS departures. `elapsed` (seconds) drives the scrolling."""
+        """Draw the departures. `elapsed` (seconds) drives all the animation."""
         self.canvas.Clear()
-        for row, departure in enumerate(departures[: config.NUM_ROWS]):
-            self.draw_row(row, departure, now, elapsed)
+        if config.TICKER_ENABLED:
+            self.draw_row(0, departures[0], now, elapsed)
+            following = departures[1 : 1 + config.TICKER_DEPARTURES]
+            self.draw_ticker(1, following, now, elapsed)
+        else:
+            for row, departure in enumerate(departures[: self.num_rows]):
+                self.draw_row(row, departure, now, elapsed)
         if warning:
             self.draw_warning()
         self.swap()
@@ -145,7 +157,7 @@ class Board:
         """One row, like SL's signs:  18 Alvik       4 min"""
         font = self.font
         top = row * self.row_height
-        baseline = top + (self.row_height - font.height) // 2 + font.baseline
+        baseline = self.baseline(row)
 
         # Work out the three columns: [line] [destination ...] [minutes]
         minutes = format_minutes(departure.minutes_left(now))
@@ -173,6 +185,51 @@ class Board:
         # 3. Line number on the left, minutes on the right.
         graphics.DrawText(self.canvas, font, 0, baseline, self.text_color, departure.line)
         graphics.DrawText(self.canvas, font, minutes_x, baseline, self.text_color, minutes)
+
+    def baseline(self, row):
+        """The y position to draw text at so it sits centered in the row."""
+        top = row * self.row_height
+        return top + (self.row_height - self.font.height) // 2 + self.font.baseline
+
+    def draw_ticker(self, row, departures, now, elapsed):
+        """Scroll departures through a row from right to left, one after another.
+
+        Each pass starts with the text just off the right edge and ends when
+        all of it has left on the left side. Then a new pass begins with the
+        latest departures.
+        """
+        distance = (elapsed - self.ticker_start) * config.TICKER_SPEED
+        pass_length = self.width + self.ticker_width(self.ticker_departures)
+        if not self.ticker_departures or distance > pass_length:
+            self.ticker_departures = departures
+            self.ticker_start = elapsed
+            distance = 0
+
+        x = self.width - int(distance)
+        for departure in self.ticker_departures:
+            item_width = self.ticker_item_width(departure)
+            if x < self.width and x + item_width > 0:  # skip items that are off screen
+                self.draw_ticker_item(departure, x, self.baseline(row), now)
+            x += item_width + TICKER_GAP
+
+    def ticker_item_width(self, departure):
+        # The minutes get a fixed-width box ("88 min"), so the text doesn't
+        # jump when e.g. "10 min" becomes "9 min" while scrolling.
+        label = f"{departure.line} {departure.destination}"
+        return self.ink_width(self.font, label) + COLUMN_GAP + self.ink_width(self.font, "88 min")
+
+    def ticker_width(self, departures):
+        return sum(self.ticker_item_width(d) + TICKER_GAP for d in departures)
+
+    def draw_ticker_item(self, departure, x, baseline, now):
+        """One ticker item, e.g. "18 Alvik 14 min", starting at x."""
+        label = f"{departure.line} {departure.destination}"
+        graphics.DrawText(self.canvas, self.font, x, baseline, self.text_color, label)
+
+        minutes = format_minutes(departure.minutes_left(now))
+        box_end = x + self.ticker_item_width(departure)  # right edge of the minutes box
+        minutes_x = box_end - self.ink_width(self.font, minutes)
+        graphics.DrawText(self.canvas, self.font, minutes_x, baseline, self.text_color, minutes)
 
     def clear_columns(self, x_start, x_end, top):
         bottom = top + self.row_height - 1

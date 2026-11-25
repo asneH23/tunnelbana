@@ -6,8 +6,8 @@ A small LED departure board for Stockholm's metro, built from a Raspberry Pi and
 in orange-yellow text like SL's platform signs.
 
 ```
-18 Alvik          4 min
-18 Hässelby s    14 min     <- long names scroll
+18 Alvik                4 min      <- the next train, standing still
+  18 Hässelby strand 14 min  <<<   <- the following trains scroll by
 ```
 
 ## Features
@@ -16,6 +16,8 @@ in orange-yellow text like SL's platform signs.
 - Only metro trains in one direction, filtered with the API's `direction_code`
 - Two rows like SL's platform signs: line number, destination and minutes left,
   e.g. "7 min" (or "Nu")
+- The top row shows the next train; the bottom row is a ticker where the
+  following departures slide in from the right and out to the left
 - A custom pixel font in the style of SL's signs (proportional letters, large
   rounded lowercase, real descenders), drawn by hand in `tools/make_sl_font.py`
 - Long destination names scroll smoothly
@@ -184,7 +186,8 @@ Everything is in `config.py`. The most common changes:
   destinations to see which one is which for your station.
 - **Night mode:** `NIGHT_START`, `NIGHT_END`, and `NIGHT_BRIGHTNESS` (0 = off).
 - **Colors and brightness:** `TEXT_COLOR`, `BRIGHTNESS`.
-- **Number of rows:** `NUM_ROWS` (2 like SL's signs; 3 also fits on the panel).
+- **Ticker:** `TICKER_SPEED` (pixels per second, lower is slower) and
+  `TICKER_DEPARTURES`. Set `TICKER_ENABLED = False` to show `NUM_ROWS` still rows instead.
 
 ## Changing the font
 
