@@ -73,7 +73,7 @@ BRIGHTNESS = 60               # 0-100
 NIGHT_MODE_ENABLED = True
 NIGHT_START = "23:00"         # 24h clock, local time
 NIGHT_END = "06:00"
-NIGHT_BRIGHTNESS = 0          # 0 = screen off, otherwise dimmed brightness (1-100)
+NIGHT_BRIGHTNESS = 10         # 0 = screen off, otherwise dimmed brightness (1-100)
 
 # --- Morning message ---------------------------------------------------------
 
@@ -84,8 +84,9 @@ MORNING_MESSAGE = ["Godmorgon!", "Ha en fin dag ♥"]
 MORNING_MESSAGE_DATE = "2026-11-26"  # only on this day ("YYYY-MM-DD"), None = every day
 MORNING_MESSAGE_START = "05:45"   # show it between these times
 MORNING_MESSAGE_END = "09:00"
-MESSAGE_SECONDS = 8               # show the message this long ...
-MESSAGE_EVERY_SECONDS = 30        # ... once every this many seconds (departures the rest)
+MESSAGE_SECONDS = 30              # show the message this long ...
+MESSAGE_EVERY_SECONDS = 30        # ... once every this many seconds (departures the rest).
+                                  # The same value for both = the message all the time.
 
 TIMEZONE = "Europe/Stockholm"  # the API returns local Stockholm times
 
