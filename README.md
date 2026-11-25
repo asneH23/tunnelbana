@@ -169,7 +169,7 @@ sudo apt install -y git python3-dev python3-venv cython3 build-essential
 
 ```bash
 cd ~
-git clone <your-repo-url> tunnelbana
+git clone https://github.com/asneH23/tunnelbana.git
 git clone https://github.com/hzeller/rpi-rgb-led-matrix.git
 cd ~/tunnelbana
 python3 -m venv .venv
