@@ -56,6 +56,7 @@ and restart the service (`sudo systemctl restart sl-skylt`).
   red mark appears in the bottom-right corner. The program never crashes on errors.
 - Night mode: the screen turns off (or dims) between configurable times
 - A clock is shown when there are no departures
+- A morning message ("Godmorgon! / Ha en fin dag ♥") now and then before 09:00
 - Runs in an emulator on a Mac/PC, so you can develop without the hardware
 
 ## Project layout
@@ -222,6 +223,9 @@ Everything is in `config.py`. The most common changes:
 - **Ticker (mode 1):** `TICKER_SPEED` (pixels per second, lower is slower) and
   `TICKER_DEPARTURES`.
 - **Display mode:** `DISPLAY_MODE`, see [Display modes](#display-modes).
+- **Morning message:** `MORNING_MESSAGE` is shown for a few seconds every half
+  minute between `MORNING_MESSAGE_START` and `MORNING_MESSAGE_END`
+  ("Godmorgon! / Ha en fin dag ♥"). Set it to `[]` to turn it off.
 
 ## Changing the font
 

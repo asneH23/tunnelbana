@@ -1,7 +1,7 @@
 from datetime import time
 
 from display import format_minutes, scroll_offset, shorten_name
-from main import is_night, parse_args
+from main import is_night, parse_args, show_morning_message
 import config
 
 
@@ -50,3 +50,22 @@ def test_mode_flag(monkeypatch):
 def test_mode_defaults_to_config(monkeypatch):
     monkeypatch.setattr("sys.argv", ["main.py"])
     assert parse_args().mode == config.DISPLAY_MODE
+
+
+def test_morning_message_only_in_the_morning_and_now_and_then(monkeypatch):
+    monkeypatch.setattr(config, "MORNING_MESSAGE", ["Godmorgon!"])
+    monkeypatch.setattr(config, "MORNING_MESSAGE_START", "06:00")
+    monkeypatch.setattr(config, "MORNING_MESSAGE_END", "09:00")
+    monkeypatch.setattr(config, "MESSAGE_SECONDS", 8)
+    monkeypatch.setattr(config, "MESSAGE_EVERY_SECONDS", 30)
+
+    assert show_morning_message(time(7, 0), elapsed=3)       # first 8 s of 30
+    assert not show_morning_message(time(7, 0), elapsed=20)  # departures
+    assert show_morning_message(time(7, 0), elapsed=62)      # next round
+    assert not show_morning_message(time(10, 0), elapsed=3)  # too late
+
+
+def test_morning_message_can_be_turned_off(monkeypatch):
+    monkeypatch.setattr(config, "MORNING_MESSAGE", [])
+
+    assert not show_morning_message(time(7, 0), elapsed=3)

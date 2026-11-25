@@ -100,7 +100,8 @@ class Board:
         self.mode = mode  # 1 = big text + ticker, 2 = small text, still rows
 
         # Load fonts before creating the matrix (it may drop root privileges).
-        self.font = load_font(config.FONT_MODE1 if mode == 1 else config.FONT_MODE2)
+        self.fonts = {1: load_font(config.FONT_MODE1), 2: load_font(config.FONT_MODE2)}
+        self.font = self.fonts[mode]  # the font for the departures in this mode
         self.large_font = load_font(config.FONT_CLOCK)
         self.text_color = graphics.Color(*config.TEXT_COLOR)
         self.warning_color = graphics.Color(*config.WARNING_COLOR)
@@ -153,6 +154,29 @@ class Board:
         note = "Inga tåg"
         x = (self.width - self.ink_width(self.font, note)) // 2
         graphics.DrawText(self.canvas, self.font, x, 28, self.text_color, note)
+        if warning:
+            self.draw_warning()
+        self.swap()
+
+    def show_message(self, lines, elapsed, warning=False):
+        """Show a few lines of text, centered. A line that is too wide scrolls."""
+        self.canvas.Clear()
+        lines = lines[:3]
+        # Big letters if two lines fit, otherwise the small font.
+        font = self.fonts[1] if len(lines) <= 2 else self.fonts[2]
+        row_height = config.PANEL_HEIGHT // len(lines)
+        padding = max(0, (row_height - font.height) // 2)
+
+        for row, text in enumerate(lines):
+            baseline = row * row_height + padding + font.baseline
+            width = self.ink_width(font, text)
+            if width <= self.width:
+                x = (self.width - width) // 2
+                graphics.DrawText(self.canvas, font, x, baseline, self.text_color, text)
+            else:
+                x = -scroll_offset(width, elapsed)
+                for copy_x in (x, x + width + SCROLL_GAP):
+                    graphics.DrawText(self.canvas, font, copy_x, baseline, self.text_color, text)
         if warning:
             self.draw_warning()
         self.swap()

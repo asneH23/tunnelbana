@@ -75,6 +75,17 @@ NIGHT_START = "23:00"         # 24h clock, local time
 NIGHT_END = "06:00"
 NIGHT_BRIGHTNESS = 0          # 0 = screen off, otherwise dimmed brightness (1-100)
 
+# --- Morning message ---------------------------------------------------------
+
+# A little message shown in the morning, one string per row (at most 3 rows).
+# The letters, digits and . , : - / ' ( ) ? ! and ♥ are available.
+# Set to [] to turn it off.
+MORNING_MESSAGE = ["Godmorgon!", "Ha en fin dag ♥"]
+MORNING_MESSAGE_START = "06:00"   # show it between these times
+MORNING_MESSAGE_END = "09:00"
+MESSAGE_SECONDS = 8               # show the message this long ...
+MESSAGE_EVERY_SECONDS = 30        # ... once every this many seconds (departures the rest)
+
 TIMEZONE = "Europe/Stockholm"  # the API returns local Stockholm times
 
 # --- Hardware (only used on the Raspberry Pi) --------------------------------

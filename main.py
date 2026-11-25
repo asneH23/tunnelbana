@@ -23,12 +23,29 @@ def parse_clock(text):
     return clock_time(int(hours), int(minutes))
 
 
-def is_night(now_time, start_text=config.NIGHT_START, end_text=config.NIGHT_END):
-    """True if now_time is inside the night period. Handles periods past midnight."""
+def in_period(now_time, start_text, end_text):
+    """True if now_time is between start and end. Handles periods past midnight."""
     start, end = parse_clock(start_text), parse_clock(end_text)
     if start <= end:
         return start <= now_time < end      # e.g. 01:00-05:00
     return now_time >= start or now_time < end  # e.g. 23:00-06:00
+
+
+def is_night(now_time, start_text=config.NIGHT_START, end_text=config.NIGHT_END):
+    return in_period(now_time, start_text, end_text)
+
+
+def show_morning_message(now_time, elapsed):
+    """True when the morning message should be on screen instead of the departures.
+
+    In the morning period the message is shown for MESSAGE_SECONDS once
+    every MESSAGE_EVERY_SECONDS, so the departures are still visible most of the time.
+    """
+    if not config.MORNING_MESSAGE:
+        return False
+    if not in_period(now_time, config.MORNING_MESSAGE_START, config.MORNING_MESSAGE_END):
+        return False
+    return elapsed % config.MESSAGE_EVERY_SECONDS < config.MESSAGE_SECONDS
 
 
 def parse_args():
@@ -79,10 +96,12 @@ def main():
                         api_ok = False
 
                 # Drop trains that have already left, then draw.
+                elapsed = time.monotonic() - start
                 upcoming = [d for d in departures if d.seconds_left(now) > 0]
-                if upcoming:
-                    board.show_departures(upcoming, now, time.monotonic() - start,
-                                          warning=not api_ok)
+                if show_morning_message(now.time(), elapsed):
+                    board.show_message(config.MORNING_MESSAGE, elapsed, warning=not api_ok)
+                elif upcoming:
+                    board.show_departures(upcoming, now, elapsed, warning=not api_ok)
                 else:
                     board.show_clock(now, warning=not api_ok)
 
