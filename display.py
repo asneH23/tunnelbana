@@ -13,7 +13,7 @@ import config
 
 PROJECT_DIR = Path(__file__).parent
 SCROLL_GAP = 16  # empty pixels between the end and the restart of a scrolling name
-COLUMN_GAP = 3   # empty pixels between line number, destination and minutes
+COLUMN_GAP = 2   # empty pixels between line number, destination and minutes
 LETTER_SPACING = 1  # every glyph in our fonts ends with one empty column
 TICKER_GAP = 16  # empty pixels between two departures in the ticker
 
@@ -178,9 +178,10 @@ class Board:
         baseline = self.baseline(row)
 
         # Work out the three columns: [line] [destination ...] [minutes]
+        line = departure.line if config.SHOW_LINE_NUMBER else ""
         minutes = format_minutes(departure.minutes_left(now))
         minutes_x = self.width - self.ink_width(font, minutes)  # right-aligned
-        dest_x = self.ink_width(font, departure.line) + COLUMN_GAP
+        dest_x = self.ink_width(font, line) + COLUMN_GAP if line else 0
         dest_end = minutes_x - COLUMN_GAP  # first column the name must not use
 
         # 1. Destination first. Too long names are shortened ("Farsta str."),
@@ -188,9 +189,7 @@ class Board:
         #    into the other columns; step 2 cleans that up.
         name = departure.destination
         if config.SHORTEN_LONG_NAMES:
-            # Measure against the widest minutes ("88 min") so the name stays
-            # the same while the minutes count down.
-            space = self.width - self.ink_width(font, "88 min") - COLUMN_GAP - dest_x
+            space = dest_end - dest_x
             name = shorten_name(name, space, lambda text: self.ink_width(font, text))
 
         name_width = self.ink_width(font, name)
@@ -207,7 +206,7 @@ class Board:
         self.clear_columns(dest_end, self.width, top)
 
         # 3. Line number on the left, minutes on the right.
-        graphics.DrawText(self.canvas, font, 0, baseline, self.text_color, departure.line)
+        graphics.DrawText(self.canvas, font, 0, baseline, self.text_color, line)
         graphics.DrawText(self.canvas, font, minutes_x, baseline, self.text_color, minutes)
 
     def baseline(self, row):

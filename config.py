@@ -43,11 +43,14 @@ FONT_LARGE = "fonts/9x18B.bdf"       # used for the clock
 TEXT_COLOR = (255, 150, 0)    # orange-yellow, like SL platform signs
 WARNING_COLOR = (200, 0, 0)   # small dot shown when the API can't be reached
 
-# Long destinations on the still rows scroll by default. Set this to True to
-# shorten them like SL's signs do ("Farsta strand" -> "Farsta str.") instead.
-# On a single 64 px panel there is only ~30 px for the name, so names get
-# cut hard ("Hässel."); it works best with a wider, chained display.
-SHORTEN_LONG_NAMES = False
+# Long destinations on the still rows are shortened like SL's signs do
+# ("Hässelby strand" -> "Hässelby str."). Set to False to scroll them instead.
+SHORTEN_LONG_NAMES = True
+
+# Show the line number ("18") on the still rows. Off by default to leave room
+# for the destination: every metro at Sandsborg is line 18, and the ticker
+# still shows it.
+SHOW_LINE_NUMBER = False
 ABBREVIATIONS = {             # whole words that may be shortened, tried first
     "strand": "str.",
     "centrum": "C",

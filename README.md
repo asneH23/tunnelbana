@@ -6,8 +6,8 @@ A small LED departure board for Stockholm's metro, built from a Raspberry Pi and
 in orange-yellow text like SL's platform signs.
 
 ```
-18 Alvik                4 min      <- the next train, standing still
-  18 Hässelby strand 14 min  <<<   <- the following trains scroll by
+Hässelby str.   4 min     <- the next train, standing still
+  18 Alvik 14 min   <<<   <- the following trains scroll by
 ```
 
 ## Features
@@ -16,7 +16,8 @@ in orange-yellow text like SL's platform signs.
 - Only metro trains in one direction, filtered with the API's `direction_code`
 - Two rows like SL's platform signs: line number, destination and minutes left,
   e.g. "7 min" (or "Nu")
-- The top row shows the next train; the bottom row is a ticker where the
+- The top row shows the next train and never moves: long names are shortened
+  like on SL's signs ("Hässelby str."). The bottom row is a ticker where the
   following departures slide in from the right and out to the left
 - A custom pixel font in the style of SL's signs (proportional letters, large
   rounded lowercase, real descenders), drawn by hand in `tools/make_sl_font.py`
@@ -186,8 +187,10 @@ Everything is in `config.py`. The most common changes:
   destinations to see which one is which for your station.
 - **Night mode:** `NIGHT_START`, `NIGHT_END`, and `NIGHT_BRIGHTNESS` (0 = off).
 - **Colors and brightness:** `TEXT_COLOR`, `BRIGHTNESS`.
-- **Long names on the top row:** they scroll by default. `SHORTEN_LONG_NAMES = True`
-  shortens them instead ("Farsta str."), using the words in `ABBREVIATIONS`.
+- **Long names on the top row:** shortened by default ("Hässelby str."), using the
+  words in `ABBREVIATIONS`. `SHORTEN_LONG_NAMES = False` scrolls them instead.
+- **Line number on the top row:** hidden by default to make room for the name
+  (all metros at Sandsborg are line 18). Turn it on with `SHOW_LINE_NUMBER = True`.
 - **Ticker:** `TICKER_SPEED` (pixels per second, lower is slower) and
   `TICKER_DEPARTURES`. Set `TICKER_ENABLED = False` to show `NUM_ROWS` still rows instead.
 
