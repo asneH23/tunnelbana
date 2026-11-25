@@ -1,0 +1,6 @@
+# Needed everywhere
+requests>=2.31
+
+# Development on a Mac/PC (not needed on the Raspberry Pi)
+RGBMatrixEmulator>=0.20 ; platform_machine != "aarch64" and platform_machine != "armv7l"
+pytest>=8
