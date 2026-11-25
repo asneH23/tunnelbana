@@ -19,7 +19,7 @@ def test_night_period_same_day():
 
 def test_format_minutes():
     assert format_minutes(0) == "Nu"
-    assert format_minutes(7) == "7"
+    assert format_minutes(7) == "7 min"
 
 
 def test_scroll_pauses_then_moves():

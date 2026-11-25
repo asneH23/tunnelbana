@@ -28,11 +28,10 @@ FRAMES_PER_SECOND = 20        # how often the screen is redrawn
 
 PANEL_WIDTH = 64
 PANEL_HEIGHT = 32
-NUM_ROWS = 3                  # number of departures shown at once
+NUM_ROWS = 2                  # number of departures shown at once (like SL's signs)
 
-FONT_SMALL = "fonts/5x7.bdf"  # used for departure rows
-FONT_LARGE = "fonts/9x18B.bdf"  # used for the clock
-FONT_TINY = "fonts/4x6.bdf"   # used for the "min" after the minutes
+FONT_SL = "fonts/sl-departures.bdf"  # SL-style font for departures (see tools/make_sl_font.py)
+FONT_LARGE = "fonts/9x18B.bdf"       # used for the clock
 
 # Colors as (red, green, blue), 0-255.
 TEXT_COLOR = (255, 150, 0)    # orange-yellow, like SL platform signs
