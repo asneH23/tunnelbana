@@ -35,7 +35,7 @@ def is_night(now_time, start_text=config.NIGHT_START, end_text=config.NIGHT_END)
     return in_period(now_time, start_text, end_text)
 
 
-def show_morning_message(now_time, elapsed):
+def show_morning_message(now, elapsed):
     """True when the morning message should be on screen instead of the departures.
 
     In the morning period the message is shown for MESSAGE_SECONDS once
@@ -43,7 +43,9 @@ def show_morning_message(now_time, elapsed):
     """
     if not config.MORNING_MESSAGE:
         return False
-    if not in_period(now_time, config.MORNING_MESSAGE_START, config.MORNING_MESSAGE_END):
+    if config.MORNING_MESSAGE_DATE and now.date().isoformat() != config.MORNING_MESSAGE_DATE:
+        return False
+    if not in_period(now.time(), config.MORNING_MESSAGE_START, config.MORNING_MESSAGE_END):
         return False
     return elapsed % config.MESSAGE_EVERY_SECONDS < config.MESSAGE_SECONDS
 
@@ -98,7 +100,7 @@ def main():
                 # Drop trains that have already left, then draw.
                 elapsed = time.monotonic() - start
                 upcoming = [d for d in departures if d.seconds_left(now) > 0]
-                if show_morning_message(now.time(), elapsed):
+                if show_morning_message(now, elapsed):
                     board.show_message(config.MORNING_MESSAGE, elapsed, warning=not api_ok)
                 elif upcoming:
                     board.show_departures(upcoming, now, elapsed, warning=not api_ok)

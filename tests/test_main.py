@@ -1,4 +1,4 @@
-from datetime import time
+from datetime import datetime, time
 
 from display import format_minutes, scroll_offset, shorten_name
 from main import is_night, parse_args, show_morning_message
@@ -54,18 +54,30 @@ def test_mode_defaults_to_config(monkeypatch):
 
 def test_morning_message_only_in_the_morning_and_now_and_then(monkeypatch):
     monkeypatch.setattr(config, "MORNING_MESSAGE", ["Godmorgon!"])
-    monkeypatch.setattr(config, "MORNING_MESSAGE_START", "06:00")
+    monkeypatch.setattr(config, "MORNING_MESSAGE_DATE", None)
+    monkeypatch.setattr(config, "MORNING_MESSAGE_START", "05:45")
     monkeypatch.setattr(config, "MORNING_MESSAGE_END", "09:00")
     monkeypatch.setattr(config, "MESSAGE_SECONDS", 8)
     monkeypatch.setattr(config, "MESSAGE_EVERY_SECONDS", 30)
+    morning = datetime(2026, 11, 26, 7, 0)
 
-    assert show_morning_message(time(7, 0), elapsed=3)       # first 8 s of 30
-    assert not show_morning_message(time(7, 0), elapsed=20)  # departures
-    assert show_morning_message(time(7, 0), elapsed=62)      # next round
-    assert not show_morning_message(time(10, 0), elapsed=3)  # too late
+    assert show_morning_message(morning, elapsed=3)       # first 8 s of 30
+    assert not show_morning_message(morning, elapsed=20)  # departures
+    assert show_morning_message(morning, elapsed=62)      # next round
+    assert not show_morning_message(datetime(2026, 11, 26, 10, 0), elapsed=3)  # too late
+
+
+def test_morning_message_only_on_its_date(monkeypatch):
+    monkeypatch.setattr(config, "MORNING_MESSAGE", ["Godmorgon!"])
+    monkeypatch.setattr(config, "MORNING_MESSAGE_DATE", "2026-11-26")
+    monkeypatch.setattr(config, "MORNING_MESSAGE_START", "05:45")
+    monkeypatch.setattr(config, "MORNING_MESSAGE_END", "09:00")
+
+    assert show_morning_message(datetime(2026, 11, 26, 5, 45), elapsed=0)
+    assert not show_morning_message(datetime(2026, 11, 27, 5, 45), elapsed=0)
 
 
 def test_morning_message_can_be_turned_off(monkeypatch):
     monkeypatch.setattr(config, "MORNING_MESSAGE", [])
 
-    assert not show_morning_message(time(7, 0), elapsed=3)
+    assert not show_morning_message(datetime(2026, 11, 26, 7, 0), elapsed=3)

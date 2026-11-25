@@ -6,6 +6,9 @@ On the Pi, stop the real board first (both use the panel):
     sudo .venv/bin/python demo.py --mode 1   # or choose a mode
     sudo systemctl start sl-skylt            # back to the real board
 
+Only the morning message (MORNING_MESSAGE in config.py), to see how it looks:
+    sudo .venv/bin/python demo.py --message
+
 Stop the demo with Ctrl+C.
 """
 
@@ -30,9 +33,14 @@ DEMO_DEPARTURES = [
 def main():
     parser = argparse.ArgumentParser(description="Demo with made-up departures")
     parser.add_argument("--mode", type=int, choices=[1, 2], default=config.DISPLAY_MODE)
+    parser.add_argument("--message", action="store_true", help="show only the morning message")
     args = parser.parse_args()
 
     board = Board(mode=args.mode)
+    if args.message:
+        show_message_only(board)
+        return
+
     started = datetime.now(STOCKHOLM)
     # 30 extra seconds so the first one shows "Nu" and the others e.g. "4 min".
     departures = [
@@ -50,6 +58,19 @@ def main():
                 board.show_departures(upcoming, now, time.monotonic() - start)
             else:
                 board.show_clock(now)
+            time.sleep(1 / config.FRAMES_PER_SECOND)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        board.show_nothing()
+
+
+def show_message_only(board):
+    print("Showing the morning message. Stop with Ctrl+C.")
+    start = time.monotonic()
+    try:
+        while True:
+            board.show_message(config.MORNING_MESSAGE, time.monotonic() - start)
             time.sleep(1 / config.FRAMES_PER_SECOND)
     except KeyboardInterrupt:
         pass

@@ -79,9 +79,10 @@ NIGHT_BRIGHTNESS = 0          # 0 = screen off, otherwise dimmed brightness (1-1
 
 # A little message shown in the morning, one string per row (at most 3 rows).
 # The letters, digits and . , : - / ' ( ) ? ! and ♥ are available.
-# Set to [] to turn it off.
+# Set to [] to turn it off. Preview it with:  python demo.py --message
 MORNING_MESSAGE = ["Godmorgon!", "Ha en fin dag ♥"]
-MORNING_MESSAGE_START = "06:00"   # show it between these times
+MORNING_MESSAGE_DATE = "2026-11-26"  # only on this day ("YYYY-MM-DD"), None = every day
+MORNING_MESSAGE_START = "05:45"   # show it between these times
 MORNING_MESSAGE_END = "09:00"
 MESSAGE_SECONDS = 8               # show the message this long ...
 MESSAGE_EVERY_SECONDS = 30        # ... once every this many seconds (departures the rest)
