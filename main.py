@@ -3,6 +3,7 @@
 Run with:  python main.py
 """
 
+import argparse
 import logging
 import signal
 import sys
@@ -30,20 +31,29 @@ def is_night(now_time, start_text=config.NIGHT_START, end_text=config.NIGHT_END)
     return now_time >= start or now_time < end  # e.g. 23:00-06:00
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="SL departure board")
+    parser.add_argument("--mode", type=int, choices=[1, 2], default=config.DISPLAY_MODE,
+                        help="1 = big text with ticker, 2 = three still rows in small text")
+    return parser.parse_args()
+
+
 def main():
+    args = parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     # systemd stops the service with SIGTERM; turn it into a normal exit so
     # the `finally` block below can switch the panel off.
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
 
-    board = Board()
+    board = Board(mode=args.mode)
     departures = []         # last successfully fetched departures
     api_ok = True
     last_fetch = None       # time.monotonic() of the last fetch attempt
     start = time.monotonic()
     frame_time = 1 / config.FRAMES_PER_SECOND
 
-    log.info("Starting board for %s (site %s)", config.STATION_NAME, config.SITE_ID)
+    log.info("Starting board for %s (site %s) in mode %s",
+             config.STATION_NAME, config.SITE_ID, args.mode)
     try:
         while True:
             try:

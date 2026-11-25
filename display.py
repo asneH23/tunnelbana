@@ -96,10 +96,12 @@ def make_options():
 
 
 class Board:
-    def __init__(self):
+    def __init__(self, mode=1):
+        self.mode = mode  # 1 = big text + ticker, 2 = small text, still rows
+
         # Load fonts before creating the matrix (it may drop root privileges).
-        self.font = load_font(config.FONT_SL)
-        self.large_font = load_font(config.FONT_LARGE)
+        self.font = load_font(config.FONT_MODE1 if mode == 1 else config.FONT_MODE2)
+        self.large_font = load_font(config.FONT_CLOCK)
         self.text_color = graphics.Color(*config.TEXT_COLOR)
         self.warning_color = graphics.Color(*config.WARNING_COLOR)
         self.black = graphics.Color(0, 0, 0)
@@ -109,7 +111,7 @@ class Board:
         self.canvas = self.matrix.CreateFrameCanvas()
 
         self.width = config.PANEL_WIDTH
-        self.num_rows = 2 if config.TICKER_ENABLED else config.NUM_ROWS
+        self.num_rows = 2 if mode == 1 else config.MODE2_ROWS
         self.row_height = config.PANEL_HEIGHT // self.num_rows
 
         # The ticker keeps the departures it is showing for a whole pass across
@@ -127,11 +129,13 @@ class Board:
     def show_departures(self, departures, now, elapsed, warning=False):
         """Draw the departures. `elapsed` (seconds) drives all the animation."""
         self.canvas.Clear()
-        if config.TICKER_ENABLED:
+        if self.mode == 1:
+            # Mode 1: the next train on top, the following ones in a ticker.
             self.draw_row(0, departures[0], now, elapsed)
             following = departures[1 : 1 + config.TICKER_DEPARTURES]
             self.draw_ticker(1, following, now, elapsed)
         else:
+            # Mode 2: one still row per departure.
             for row, departure in enumerate(departures[: self.num_rows]):
                 self.draw_row(row, departure, now, elapsed)
         if warning:
@@ -188,7 +192,7 @@ class Board:
         #    or scroll if shortening is turned off. Scrolled text may spill
         #    into the other columns; step 2 cleans that up.
         name = departure.destination
-        if config.SHORTEN_LONG_NAMES:
+        if config.SHORTEN_LONG_NAMES or self.mode == 2:
             space = dest_end - dest_x
             name = shorten_name(name, space, lambda text: self.ink_width(font, text))
 
@@ -212,7 +216,9 @@ class Board:
     def baseline(self, row):
         """The y position to draw text at so it sits centered in the row."""
         top = row * self.row_height
-        return top + (self.row_height - self.font.height) // 2 + self.font.baseline
+        # If the font is taller than the row (accent rows included), start at the top.
+        padding = max(0, (self.row_height - self.font.height) // 2)
+        return top + padding + self.font.baseline
 
     def draw_ticker(self, row, departures, now, elapsed):
         """Scroll departures through a row from right to left, one after another.

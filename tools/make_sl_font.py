@@ -1,28 +1,32 @@
-"""Generate fonts/sl-departures.bdf, a pixel font in the style of SL's platform signs.
+"""Generate the SL-style pixel fonts used by the departure board.
+
+  fonts/sl-large.bdf  - mode 1 (big text, 2 rows), capitals 10 px tall
+  fonts/sl-small.bdf  - mode 2 (small text, 3 rows), capitals 7 px tall
 
 Each glyph is drawn below as text: "#" is a lit LED, "." is off.
 Edit a glyph, then run:  python tools/make_sl_font.py
 
-Glyph rules
-  * 12 rows: 10 rows above the baseline (cap height) + 2 rows of descender.
-  * 14 rows: the same, plus 2 extra rows on top for Å, Ä, Ö, É and å.
-  * Lowercase letters use the bottom 7 of the 10 rows (the x-height), which
-    gives the large, rounded lowercase of SL's signs.
-  * Letters are tall and narrow (condensed) like on SL's signs: tall so they
-    fill the row, and mostly 3 pixels wide so names fit on a 64 px panel.
+Glyph rules (cap = the font's capital height, 10 or 7 rows)
+  * cap + 2 rows: the capital height, plus 2 rows of descender (g, j, p, q, y).
+  * cap + 4 rows: the same, plus 2 extra rows on top for Å, Ä, Ö, É and å.
+  * Lowercase letters use the bottom part of the cap height (the x-height),
+    which gives the large, rounded lowercase of SL's signs.
+  * Letters are tall and narrow (condensed) like on SL's signs, mostly
+    3 pixels wide so names fit on a 64 px panel.
   * The width can differ per glyph (proportional font). One empty column is
     added automatically after every glyph.
 """
 
 from pathlib import Path
 
-OUTPUT = Path(__file__).parent.parent / "fonts" / "sl-departures.bdf"
-DESCENT = 2       # rows below the baseline
-ASCENT = 12       # rows above the baseline, including room for Å/Ä/Ö accents
+FONTS_DIR = Path(__file__).parent.parent / "fonts"
+DESCENT = 2        # rows below the baseline
+ACCENT_ROWS = 2    # rows above the capitals, for Å/Ä/Ö
 LETTER_SPACING = 1
 SPACE_WIDTH = 2
 
-GLYPHS = {
+# Mode 1: capitals 10 px tall.
+LARGE_GLYPHS = {
     # --- digits ------------------------------------------------------
     '0': """
 .#.
@@ -1146,9 +1150,905 @@ GLYPHS = {
 }
 
 
-def parse_glyph(char, art):
+# Mode 2: capitals 7 px tall.
+SMALL_GLYPHS = {
+    # --- digits ------------------------------------------------------
+    '0': """
+.#.
+#.#
+#.#
+#.#
+#.#
+#.#
+.#.
+...
+...
+""",
+    '1': """
+.#
+##
+.#
+.#
+.#
+.#
+.#
+..
+..
+""",
+    '2': """
+.#.
+#.#
+..#
+.#.
+#..
+#..
+###
+...
+...
+""",
+    '3': """
+##.
+..#
+..#
+.#.
+..#
+..#
+##.
+...
+...
+""",
+    '4': """
+#.#
+#.#
+#.#
+###
+..#
+..#
+..#
+...
+...
+""",
+    '5': """
+###
+#..
+##.
+..#
+..#
+..#
+##.
+...
+...
+""",
+    '6': """
+.##
+#..
+##.
+#.#
+#.#
+#.#
+.#.
+...
+...
+""",
+    '7': """
+###
+..#
+..#
+.#.
+.#.
+.#.
+.#.
+...
+...
+""",
+    '8': """
+.#.
+#.#
+#.#
+.#.
+#.#
+#.#
+.#.
+...
+...
+""",
+    '9': """
+.#.
+#.#
+#.#
+#.#
+.##
+..#
+##.
+...
+...
+""",
+    # --- uppercase ---------------------------------------------------
+    'A': """
+.#.
+#.#
+#.#
+###
+#.#
+#.#
+#.#
+...
+...
+""",
+    'B': """
+##.
+#.#
+#.#
+##.
+#.#
+#.#
+##.
+...
+...
+""",
+    'C': """
+.##
+#..
+#..
+#..
+#..
+#..
+.##
+...
+...
+""",
+    'D': """
+##.
+#.#
+#.#
+#.#
+#.#
+#.#
+##.
+...
+...
+""",
+    'E': """
+###
+#..
+#..
+##.
+#..
+#..
+###
+...
+...
+""",
+    'F': """
+###
+#..
+#..
+##.
+#..
+#..
+#..
+...
+...
+""",
+    'G': """
+.##
+#..
+#..
+#.#
+#.#
+#.#
+.##
+...
+...
+""",
+    'H': """
+#.#
+#.#
+#.#
+###
+#.#
+#.#
+#.#
+...
+...
+""",
+    'I': """
+#
+#
+#
+#
+#
+#
+#
+.
+.
+""",
+    'J': """
+..#
+..#
+..#
+..#
+..#
+#.#
+.#.
+...
+...
+""",
+    'K': """
+#.#
+#.#
+##.
+##.
+##.
+#.#
+#.#
+...
+...
+""",
+    'L': """
+#..
+#..
+#..
+#..
+#..
+#..
+###
+...
+...
+""",
+    'M': """
+#...#
+##.##
+#.#.#
+#.#.#
+#...#
+#...#
+#...#
+.....
+.....
+""",
+    'N': """
+#..#
+##.#
+##.#
+#.##
+#.##
+#..#
+#..#
+....
+....
+""",
+    'O': """
+.#.
+#.#
+#.#
+#.#
+#.#
+#.#
+.#.
+...
+...
+""",
+    'P': """
+##.
+#.#
+#.#
+#.#
+##.
+#..
+#..
+...
+...
+""",
+    'Q': """
+.#.
+#.#
+#.#
+#.#
+#.#
+.#.
+..#
+...
+...
+""",
+    'R': """
+##.
+#.#
+#.#
+##.
+#.#
+#.#
+#.#
+...
+...
+""",
+    'S': """
+.##
+#..
+#..
+.#.
+..#
+..#
+##.
+...
+...
+""",
+    'T': """
+###
+.#.
+.#.
+.#.
+.#.
+.#.
+.#.
+...
+...
+""",
+    'U': """
+#.#
+#.#
+#.#
+#.#
+#.#
+#.#
+.#.
+...
+...
+""",
+    'V': """
+#.#
+#.#
+#.#
+#.#
+#.#
+.#.
+.#.
+...
+...
+""",
+    'W': """
+#...#
+#...#
+#...#
+#.#.#
+#.#.#
+##.##
+#...#
+.....
+.....
+""",
+    'X': """
+#.#
+#.#
+.#.
+.#.
+.#.
+#.#
+#.#
+...
+...
+""",
+    'Y': """
+#.#
+#.#
+#.#
+.#.
+.#.
+.#.
+.#.
+...
+...
+""",
+    'Z': """
+###
+..#
+..#
+.#.
+#..
+#..
+###
+...
+...
+""",
+    'Å': """
+.#.
+#.#
+.#.
+#.#
+#.#
+###
+#.#
+#.#
+#.#
+...
+...
+""",
+    'Ä': """
+#.#
+...
+.#.
+#.#
+#.#
+###
+#.#
+#.#
+#.#
+...
+...
+""",
+    'Ö': """
+#.#
+...
+.#.
+#.#
+#.#
+#.#
+#.#
+#.#
+.#.
+...
+...
+""",
+    'É': """
+..#
+...
+###
+#..
+#..
+##.
+#..
+#..
+###
+...
+...
+""",
+    # --- lowercase ---------------------------------------------------
+    'a': """
+...
+...
+##.
+..#
+.##
+#.#
+.##
+...
+...
+""",
+    'b': """
+#..
+#..
+##.
+#.#
+#.#
+#.#
+##.
+...
+...
+""",
+    'c': """
+...
+...
+.##
+#..
+#..
+#..
+.##
+...
+...
+""",
+    'd': """
+..#
+..#
+.##
+#.#
+#.#
+#.#
+.##
+...
+...
+""",
+    'e': """
+...
+...
+.#.
+#.#
+###
+#..
+.##
+...
+...
+""",
+    'f': """
+.##
+#..
+##.
+#..
+#..
+#..
+#..
+...
+...
+""",
+    'g': """
+...
+...
+.##
+#.#
+#.#
+#.#
+.##
+..#
+##.
+""",
+    'h': """
+#..
+#..
+##.
+#.#
+#.#
+#.#
+#.#
+...
+...
+""",
+    'i': """
+#
+.
+#
+#
+#
+#
+#
+.
+.
+""",
+    'j': """
+.#
+..
+.#
+.#
+.#
+.#
+.#
+.#
+#.
+""",
+    'k': """
+#..
+#..
+#.#
+##.
+##.
+#.#
+#.#
+...
+...
+""",
+    'l': """
+#
+#
+#
+#
+#
+#
+#
+.
+.
+""",
+    'm': """
+.....
+.....
+####.
+#.#.#
+#.#.#
+#.#.#
+#.#.#
+.....
+.....
+""",
+    'n': """
+...
+...
+##.
+#.#
+#.#
+#.#
+#.#
+...
+...
+""",
+    'o': """
+...
+...
+.#.
+#.#
+#.#
+#.#
+.#.
+...
+...
+""",
+    'p': """
+...
+...
+##.
+#.#
+#.#
+#.#
+##.
+#..
+#..
+""",
+    'q': """
+...
+...
+.##
+#.#
+#.#
+#.#
+.##
+..#
+..#
+""",
+    'r': """
+...
+...
+#.#
+##.
+#..
+#..
+#..
+...
+...
+""",
+    's': """
+...
+...
+.##
+#..
+.#.
+..#
+##.
+...
+...
+""",
+    't': """
+...
+.#.
+###
+.#.
+.#.
+.#.
+..#
+...
+...
+""",
+    'u': """
+...
+...
+#.#
+#.#
+#.#
+#.#
+.##
+...
+...
+""",
+    'v': """
+...
+...
+#.#
+#.#
+#.#
+.#.
+.#.
+...
+...
+""",
+    'w': """
+.....
+.....
+#...#
+#...#
+#.#.#
+#.#.#
+.#.#.
+.....
+.....
+""",
+    'x': """
+...
+...
+#.#
+#.#
+.#.
+#.#
+#.#
+...
+...
+""",
+    'y': """
+...
+...
+#.#
+#.#
+#.#
+#.#
+.##
+..#
+##.
+""",
+    'z': """
+...
+...
+###
+..#
+.#.
+#..
+###
+...
+...
+""",
+    'å': """
+.#.
+#.#
+.#.
+...
+##.
+..#
+.##
+#.#
+.##
+...
+...
+""",
+    'ä': """
+#.#
+...
+##.
+..#
+.##
+#.#
+.##
+...
+...
+""",
+    'ö': """
+#.#
+...
+.#.
+#.#
+#.#
+#.#
+.#.
+...
+...
+""",
+    'é': """
+..#
+...
+.#.
+#.#
+###
+#..
+.##
+...
+...
+""",
+    # --- punctuation -------------------------------------------------
+    '.': """
+.
+.
+.
+.
+.
+.
+#
+.
+.
+""",
+    ',': """
+..
+..
+..
+..
+..
+..
+.#
+.#
+#.
+""",
+    ':': """
+.
+.
+#
+.
+.
+#
+.
+.
+.
+""",
+    '-': """
+..
+..
+..
+##
+..
+..
+..
+..
+..
+""",
+    '/': """
+..#
+..#
+.#.
+.#.
+.#.
+#..
+#..
+...
+...
+""",
+    "'": """
+#
+#
+.
+.
+.
+.
+.
+.
+.
+""",
+    '(': """
+.#
+#.
+#.
+#.
+#.
+#.
+.#
+..
+..
+""",
+    ')': """
+#.
+.#
+.#
+.#
+.#
+.#
+#.
+..
+..
+""",
+    '?': """
+.#.
+#.#
+..#
+.#.
+.#.
+...
+.#.
+...
+...
+""",
+}
+
+
+# (file name, capital height, glyphs)
+FONTS = [
+    ("sl-large.bdf", 10, LARGE_GLYPHS),
+    ("sl-small.bdf", 7, SMALL_GLYPHS),
+]
+
+
+def parse_glyph(char, art, cap_height):
     rows = art.strip().split("\n")
-    assert len(rows) in (12, 14), f"{char!r}: expected 12 or 14 rows, got {len(rows)}"
+    allowed = (cap_height + DESCENT, cap_height + DESCENT + ACCENT_ROWS)
+    assert len(rows) in allowed, f"{char!r}: expected {allowed[0]} or {allowed[1]} rows, got {len(rows)}"
     width = len(rows[0])
     assert all(len(row) == width for row in rows), f"{char!r}: rows have different widths"
     assert set("".join(rows)) <= {"#", "."}, f"{char!r}: use only '#' and '.'"
@@ -1162,11 +2062,11 @@ def bitmap_hex(row):
     return f"{int(bits, 2):0{padded_width // 4}X}"
 
 
-def bdf_char(name, codepoint, rows, advance):
+def bdf_char(name, codepoint, rows, advance, height):
     lines = [
         f"STARTCHAR {name}",
         f"ENCODING {codepoint}",
-        f"SWIDTH {advance * 1000 // (ASCENT + DESCENT)} 0",
+        f"SWIDTH {advance * 1000 // height} 0",
         f"DWIDTH {advance} 0",
         f"BBX {len(rows[0])} {len(rows)} 0 {-DESCENT}",
         "BITMAP",
@@ -1176,28 +2076,38 @@ def bdf_char(name, codepoint, rows, advance):
     return "\n".join(lines)
 
 
-def main():
-    chars = [bdf_char("space", 32, ["."], SPACE_WIDTH)]
-    for char, art in GLYPHS.items():
-        rows = parse_glyph(char, art)
-        chars.append(bdf_char(f"U+{ord(char):04X}", ord(char), rows, len(rows[0]) + LETTER_SPACING))
+def write_font(file_name, cap_height, glyphs):
+    ascent = cap_height + ACCENT_ROWS
+    height = ascent + DESCENT
+    parsed = {char: parse_glyph(char, art, cap_height) for char, art in glyphs.items()}
 
-    max_width = max(len(parse_glyph(c, a)[0]) for c, a in GLYPHS.items())
+    chars = [bdf_char("space", 32, ["."], SPACE_WIDTH, height)]
+    for char, rows in parsed.items():
+        advance = len(rows[0]) + LETTER_SPACING
+        chars.append(bdf_char(f"U+{ord(char):04X}", ord(char), rows, advance, height))
+
+    max_width = max(len(rows[0]) for rows in parsed.values())
     header = [
         "STARTFONT 2.1",
         "COMMENT Pixel font in the style of SL platform signs.",
         "COMMENT Generated by tools/make_sl_font.py - edit that file, not this one.",
-        f"FONT -tunnelbana-SL Departures-Medium-R-Normal--{ASCENT + DESCENT}-110-75-75-P-50-ISO10646-1",
-        f"SIZE {ASCENT + DESCENT} 75 75",
-        f"FONTBOUNDINGBOX {max_width} {ASCENT + DESCENT} 0 {-DESCENT}",
+        f"FONT -tunnelbana-SL Departures-Medium-R-Normal--{height}-{height * 10}-75-75-P-40-ISO10646-1",
+        f"SIZE {height} 75 75",
+        f"FONTBOUNDINGBOX {max_width} {height} 0 {-DESCENT}",
         "STARTPROPERTIES 2",
-        f"FONT_ASCENT {ASCENT}",
+        f"FONT_ASCENT {ascent}",
         f"FONT_DESCENT {DESCENT}",
         "ENDPROPERTIES",
         f"CHARS {len(chars)}",
     ]
-    OUTPUT.write_text("\n".join(header + chars + ["ENDFONT"]) + "\n")
-    print(f"Wrote {len(chars)} glyphs to {OUTPUT}")
+    path = FONTS_DIR / file_name
+    path.write_text("\n".join(header + chars + ["ENDFONT"]) + "\n")
+    print(f"Wrote {len(chars)} glyphs to {path}")
+
+
+def main():
+    for file_name, cap_height, glyphs in FONTS:
+        write_font(file_name, cap_height, glyphs)
 
 
 if __name__ == "__main__":

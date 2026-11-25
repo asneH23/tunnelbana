@@ -10,6 +10,34 @@ Hässelby str.   4 min     <- the next train, standing still
   18 Alvik 14 min   <<<   <- the following trains scroll by
 ```
 
+## Display modes
+
+The board has two modes. Choose one with `DISPLAY_MODE` in `config.py`, or when
+starting the program:
+
+```bash
+python main.py --mode 1   # default
+python main.py --mode 2
+```
+
+**Mode 1** – the next train in big text, the following trains scroll by:
+
+```
+Hässelby str.   4 min     <- still
+  18 Alvik 14 min   <<<   <- ticker
+```
+
+**Mode 2** – three still rows in smaller text. Nothing moves except the minutes:
+
+```
+Hässelby str.     4 min
+Alvik            14 min
+Åkeshov          24 min
+```
+
+To change the mode of the board at boot, edit `DISPLAY_MODE` in `config.py`
+and restart the service (`sudo systemctl restart sl-skylt`).
+
 ## Features
 
 - Live departures from SL's open Transport API (no API key needed)
@@ -191,8 +219,9 @@ Everything is in `config.py`. The most common changes:
   words in `ABBREVIATIONS`. `SHORTEN_LONG_NAMES = False` scrolls them instead.
 - **Line number on the top row:** hidden by default to make room for the name
   (all metros at Sandsborg are line 18). Turn it on with `SHOW_LINE_NUMBER = True`.
-- **Ticker:** `TICKER_SPEED` (pixels per second, lower is slower) and
-  `TICKER_DEPARTURES`. Set `TICKER_ENABLED = False` to show `NUM_ROWS` still rows instead.
+- **Ticker (mode 1):** `TICKER_SPEED` (pixels per second, lower is slower) and
+  `TICKER_DEPARTURES`.
+- **Display mode:** `DISPLAY_MODE`, see [Display modes](#display-modes).
 
 ## Changing the font
 

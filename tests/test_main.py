@@ -1,7 +1,7 @@
 from datetime import time
 
 from display import format_minutes, scroll_offset, shorten_name
-from main import is_night
+from main import is_night, parse_args
 import config
 
 
@@ -40,3 +40,13 @@ def test_known_words_are_abbreviated():
 def test_too_long_names_are_cut_with_a_dot():
     assert shorten_name("Skogskyrkogården", 12, len) == "Skogskyrkog."
     assert shorten_name("Hässelby strand", 11, len) == "Hässelby s."
+
+
+def test_mode_flag(monkeypatch):
+    monkeypatch.setattr("sys.argv", ["main.py", "--mode", "2"])
+    assert parse_args().mode == 2
+
+
+def test_mode_defaults_to_config(monkeypatch):
+    monkeypatch.setattr("sys.argv", ["main.py"])
+    assert parse_args().mode == config.DISPLAY_MODE
