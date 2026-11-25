@@ -1,0 +1,26 @@
+# systemd service that starts the departure board when the Pi boots.
+#
+# Install (adjust the paths below if your user isn't "pi"):
+#   sudo cp sl-skylt.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now sl-skylt
+
+[Unit]
+Description=SL departure board on an RGB LED matrix
+# Wait for the network and for the clock to be synced, so the minutes are right.
+Wants=network-online.target time-sync.target
+After=network-online.target time-sync.target
+
+[Service]
+Type=simple
+# The LED matrix library needs root to access the GPIO hardware timing.
+User=root
+WorkingDirectory=/home/pi/tunnelbana
+ExecStart=/home/pi/tunnelbana/.venv/bin/python main.py
+Environment=PYTHONUNBUFFERED=1
+Environment=SL_EMULATOR=0
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
