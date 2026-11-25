@@ -1,0 +1,197 @@
+{
+  "departures": [
+    {
+      "destination": "Alvik",
+      "direction_code": 1,
+      "direction": "Hässelby strand",
+      "state": "EXPECTED",
+      "display": "1 min",
+      "scheduled": "2026-11-25T12:47:06",
+      "expected": "2026-11-25T12:47:09",
+      "journey": {
+        "id": 2026112510596,
+        "state": "NORMALPROGRESS",
+        "prediction_state": "NORMAL"
+      },
+      "stop_area": {
+        "id": 1821,
+        "name": "Sandsborg",
+        "type": "METROSTN"
+      },
+      "stop_point": {
+        "id": 1821,
+        "name": "Sandsborg",
+        "designation": "1"
+      },
+      "line": {
+        "id": 18,
+        "designation": "18",
+        "transport_authority_id": 1,
+        "transport_mode": "METRO",
+        "group_of_lines": "Tunnelbanans gröna linje"
+      },
+      "deviations": []
+    },
+    {
+      "destination": "Farsta strand",
+      "direction_code": 2,
+      "direction": "Farsta strand",
+      "state": "EXPECTED",
+      "display": "5 min",
+      "scheduled": "2026-11-25T12:50:36",
+      "expected": "2026-11-25T12:51:14",
+      "journey": {
+        "id": 2026112510584,
+        "state": "NORMALPROGRESS",
+        "prediction_state": "NORMAL"
+      },
+      "stop_area": {
+        "id": 1821,
+        "name": "Sandsborg",
+        "type": "METROSTN"
+      },
+      "stop_point": {
+        "id": 1822,
+        "name": "Sandsborg",
+        "designation": "2"
+      },
+      "line": {
+        "id": 18,
+        "designation": "18",
+        "transport_authority_id": 1,
+        "transport_mode": "METRO",
+        "group_of_lines": "Tunnelbanans gröna linje"
+      },
+      "deviations": []
+    },
+    {
+      "destination": "Alvik",
+      "direction_code": 1,
+      "direction": "Hässelby strand",
+      "state": "EXPECTED",
+      "display": "11 min",
+      "scheduled": "2026-11-25T12:57:06",
+      "expected": "2026-11-25T12:57:09",
+      "journey": {
+        "id": 2026112510604,
+        "state": "NORMALPROGRESS",
+        "prediction_state": "NORMAL"
+      },
+      "stop_area": {
+        "id": 1821,
+        "name": "Sandsborg",
+        "type": "METROSTN"
+      },
+      "stop_point": {
+        "id": 1821,
+        "name": "Sandsborg",
+        "designation": "1"
+      },
+      "line": {
+        "id": 18,
+        "designation": "18",
+        "transport_authority_id": 1,
+        "transport_mode": "METRO",
+        "group_of_lines": "Tunnelbanans gröna linje"
+      },
+      "deviations": []
+    },
+    {
+      "destination": "Farsta strand",
+      "direction_code": 2,
+      "direction": "Farsta strand",
+      "state": "EXPECTED",
+      "display": "14 min",
+      "scheduled": "2026-11-25T13:00:36",
+      "expected": "2026-11-25T13:00:36",
+      "journey": {
+        "id": 2026112510592,
+        "state": "NORMALPROGRESS",
+        "prediction_state": "NORMAL"
+      },
+      "stop_area": {
+        "id": 1821,
+        "name": "Sandsborg",
+        "type": "METROSTN"
+      },
+      "stop_point": {
+        "id": 1822,
+        "name": "Sandsborg",
+        "designation": "2"
+      },
+      "line": {
+        "id": 18,
+        "designation": "18",
+        "transport_authority_id": 1,
+        "transport_mode": "METRO",
+        "group_of_lines": "Tunnelbanans gröna linje"
+      },
+      "deviations": []
+    },
+    {
+      "destination": "Alvik",
+      "direction_code": 1,
+      "direction": "Hässelby strand",
+      "state": "EXPECTED",
+      "display": "21 min",
+      "scheduled": "2026-11-25T13:07:06",
+      "expected": "2026-11-25T13:07:09",
+      "journey": {
+        "id": 2026112510612,
+        "state": "NORMALPROGRESS",
+        "prediction_state": "NORMAL"
+      },
+      "stop_area": {
+        "id": 1821,
+        "name": "Sandsborg",
+        "type": "METROSTN"
+      },
+      "stop_point": {
+        "id": 1821,
+        "name": "Sandsborg",
+        "designation": "1"
+      },
+      "line": {
+        "id": 18,
+        "designation": "18",
+        "transport_authority_id": 1,
+        "transport_mode": "METRO",
+        "group_of_lines": "Tunnelbanans gröna linje"
+      },
+      "deviations": []
+    },
+    {
+      "destination": "Farsta strand",
+      "direction_code": 2,
+      "direction": "Farsta strand",
+      "state": "EXPECTED",
+      "display": "24 min",
+      "scheduled": "2026-11-25T13:10:36",
+      "expected": "2026-11-25T13:10:36",
+      "journey": {
+        "id": 2026112510600,
+        "state": "NORMALPROGRESS",
+        "prediction_state": "NORMAL"
+      },
+      "stop_area": {
+        "id": 1821,
+        "name": "Sandsborg",
+        "type": "METROSTN"
+      },
+      "stop_point": {
+        "id": 1822,
+        "name": "Sandsborg",
+        "designation": "2"
+      },
+      "line": {
+        "id": 18,
+        "designation": "18",
+        "transport_authority_id": 1,
+        "transport_mode": "METRO",
+        "group_of_lines": "Tunnelbanans gröna linje"
+      },
+      "deviations": []
+    }
+  ],
+  "stop_deviations": []
+}
