@@ -34,7 +34,7 @@ PANEL_HEIGHT = 32
 DISPLAY_MODE = 1
 
 # Mode 1: the bottom row scrolls the following departures right to left.
-TICKER_SPEED = 15             # pixels per second (lower = slower)
+TICKER_SPEED = 10             # pixels per second (lower = slower)
 TICKER_DEPARTURES = 3         # how many of the following departures scroll by
 TICKER_BRIGHTNESS = 0.7       # the ticker row compared to the top row (0.7 = 30% dimmer)
 TICKER_SMALL_TEXT = True      # smaller letters in the ticker (the mode 2 font), False = same as top row
