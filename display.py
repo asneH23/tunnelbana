@@ -266,7 +266,8 @@ class Board:
         for departure in self.ticker_departures:
             item_width = self.ticker_item_width(departure)
             if x < self.width and x + item_width > 0:  # skip items that are off screen
-                self.draw_ticker_item(departure, x, self.baseline(row, self.ticker_font), now)
+                baseline = self.baseline(row, self.ticker_font) - config.TICKER_RAISE
+                self.draw_ticker_item(departure, x, baseline, now)
             x += item_width + TICKER_GAP
 
     def ticker_item_width(self, departure):
