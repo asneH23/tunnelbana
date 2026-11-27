@@ -37,6 +37,7 @@ DISPLAY_MODE = 1
 TICKER_SPEED = 15             # pixels per second (lower = slower)
 TICKER_DEPARTURES = 3         # how many of the following departures scroll by
 TICKER_BRIGHTNESS = 0.8       # the ticker row compared to the top row (0.8 = 20% dimmer)
+TICKER_SMALL_TEXT = True      # smaller letters in the ticker (the mode 2 font), False = same as top row
 
 # Mode 2: number of still rows.
 MODE2_ROWS = 3

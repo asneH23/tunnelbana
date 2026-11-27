@@ -102,6 +102,7 @@ class Board:
         # Load fonts before creating the matrix (it may drop root privileges).
         self.fonts = {1: load_font(config.FONT_MODE1), 2: load_font(config.FONT_MODE2)}
         self.font = self.fonts[mode]  # the font for the departures in this mode
+        self.ticker_font = self.fonts[2] if config.TICKER_SMALL_TEXT else self.fonts[1]
         self.large_font = load_font(config.FONT_CLOCK)
         self.text_color = graphics.Color(*config.TEXT_COLOR)
         self.ticker_color = graphics.Color(
@@ -239,12 +240,13 @@ class Board:
         graphics.DrawText(self.canvas, font, 0, baseline, self.text_color, line)
         graphics.DrawText(self.canvas, font, minutes_x, baseline, self.text_color, minutes)
 
-    def baseline(self, row):
+    def baseline(self, row, font=None):
         """The y position to draw text at so it sits centered in the row."""
+        font = font or self.font
         top = row * self.row_height
         # If the font is taller than the row (accent rows included), start at the top.
-        padding = max(0, (self.row_height - self.font.height) // 2)
-        return top + padding + self.font.baseline
+        padding = max(0, (self.row_height - font.height) // 2)
+        return top + padding + font.baseline
 
     def draw_ticker(self, row, departures, now, elapsed):
         """Scroll departures through a row from right to left, one after another.
@@ -264,14 +266,15 @@ class Board:
         for departure in self.ticker_departures:
             item_width = self.ticker_item_width(departure)
             if x < self.width and x + item_width > 0:  # skip items that are off screen
-                self.draw_ticker_item(departure, x, self.baseline(row), now)
+                self.draw_ticker_item(departure, x, self.baseline(row, self.ticker_font), now)
             x += item_width + TICKER_GAP
 
     def ticker_item_width(self, departure):
         # The minutes get a fixed-width box ("88 min"), so the text doesn't
         # jump when e.g. "10 min" becomes "9 min" while scrolling.
         label = f"{departure.line} {departure.destination}"
-        return self.ink_width(self.font, label) + COLUMN_GAP + self.ink_width(self.font, "88 min")
+        font = self.ticker_font
+        return self.ink_width(font, label) + COLUMN_GAP + self.ink_width(font, "88 min")
 
     def ticker_width(self, departures):
         return sum(self.ticker_item_width(d) + TICKER_GAP for d in departures)
@@ -279,12 +282,12 @@ class Board:
     def draw_ticker_item(self, departure, x, baseline, now):
         """One ticker item, e.g. "18 Alvik 14 min", starting at x."""
         label = f"{departure.line} {departure.destination}"
-        graphics.DrawText(self.canvas, self.font, x, baseline, self.ticker_color, label)
+        graphics.DrawText(self.canvas, self.ticker_font, x, baseline, self.ticker_color, label)
 
         minutes = format_minutes(departure.minutes_left(now))
         box_end = x + self.ticker_item_width(departure)  # right edge of the minutes box
-        minutes_x = box_end - self.ink_width(self.font, minutes)
-        graphics.DrawText(self.canvas, self.font, minutes_x, baseline, self.ticker_color, minutes)
+        minutes_x = box_end - self.ink_width(self.ticker_font, minutes)
+        graphics.DrawText(self.canvas, self.ticker_font, minutes_x, baseline, self.ticker_color, minutes)
 
     def clear_columns(self, x_start, x_end, top):
         bottom = top + self.row_height - 1
