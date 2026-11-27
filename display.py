@@ -104,6 +104,8 @@ class Board:
         self.font = self.fonts[mode]  # the font for the departures in this mode
         self.large_font = load_font(config.FONT_CLOCK)
         self.text_color = graphics.Color(*config.TEXT_COLOR)
+        self.ticker_color = graphics.Color(
+            *(round(value * config.TICKER_BRIGHTNESS) for value in config.TEXT_COLOR))
         self.warning_color = graphics.Color(*config.WARNING_COLOR)
         self.black = graphics.Color(0, 0, 0)
 
@@ -277,12 +279,12 @@ class Board:
     def draw_ticker_item(self, departure, x, baseline, now):
         """One ticker item, e.g. "18 Alvik 14 min", starting at x."""
         label = f"{departure.line} {departure.destination}"
-        graphics.DrawText(self.canvas, self.font, x, baseline, self.text_color, label)
+        graphics.DrawText(self.canvas, self.font, x, baseline, self.ticker_color, label)
 
         minutes = format_minutes(departure.minutes_left(now))
         box_end = x + self.ticker_item_width(departure)  # right edge of the minutes box
         minutes_x = box_end - self.ink_width(self.font, minutes)
-        graphics.DrawText(self.canvas, self.font, minutes_x, baseline, self.text_color, minutes)
+        graphics.DrawText(self.canvas, self.font, minutes_x, baseline, self.ticker_color, minutes)
 
     def clear_columns(self, x_start, x_end, top):
         bottom = top + self.row_height - 1
